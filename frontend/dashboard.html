@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Road Damage AI | Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+
+    <!-- ================= TOP BAR ================= -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🛣️
+            </div>
+
+            <div>
+
+                <h2>Road Damage AI</h2>
+
+                <span>
+                    AI + IoT Smart Infrastructure
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="logout-btn"
+            onclick="logout()">
+
+            🚪 Logout
+
+        </button>
+
+    </header>
+
+
+
+    <!-- ================= WELCOME ================= -->
+
+    <section class="welcome">
+
+        <p class="small-title">
+            SMART CITY INFRASTRUCTURE
+        </p>
+
+        <h1>
+            Road Inspection Dashboard
+        </h1>
+
+        <p>
+            AI-powered road damage detection and infrastructure monitoring.
+        </p>
+
+    </section>
+
+
+
+    <!-- ================= STAT CARDS ================= -->
+
+    <section class="stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🚨
+            </div>
+
+            <div class="stat-value"
+                 id="alertCount">
+
+                0
+
+            </div>
+
+            <div class="stat-label">
+                Active Alerts
+            </div>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🛣️
+            </div>
+
+            <div class="stat-value">
+                48 km
+            </div>
+
+            <div class="stat-label">
+                Roads Inspected
+            </div>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🤖
+            </div>
+
+            <div class="stat-value">
+                AI
+            </div>
+
+            <div class="stat-label">
+                Detection Engine
+            </div>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📡
+            </div>
+
+            <div
+                class="stat-value online"
+                id="systemStatus">
+
+                CHECKING
+
+            </div>
+
+            <div class="stat-label">
+                System Health
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= MAIN GRID ================= -->
+
+    <section class="main-grid">
+
+
+        <!-- ================= AI INSPECTION ================= -->
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        🤖 AI Road Inspection
+                    </h2>
+
+                    <p>
+                        Upload a road image and let the trained YOLO model detect damage.
+                    </p>
+
+                </div>
+
+                <span class="live-badge">
+                    ● LIVE
+                </span>
+
+            </div>
+
+
+
+            <!-- UPLOAD -->
+
+            <div class="upload-box">
+
+                <div class="upload-icon">
+                    📤
+                </div>
+
+                <h3>
+                    Upload Road Image
+                </h3>
+
+                <p>
+                    Supported formats: JPG, JPEG, PNG
+                </p>
+
+
+                <input
+                    type="file"
+                    id="roadFile"
+                    accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+
+
+                <label
+                    for="roadFile"
+                    class="choose-btn">
+
+                    Choose Image
+
+                </label>
+
+
+                <div
+                    id="fileName"
+                    class="file-name">
+
+                    No image selected
+
+                </div>
+
+            </div>
+
+
+
+            <!-- INSPECTION BUTTON -->
+
+            <button
+                id="inspectBtn"
+                class="inspection-btn"
+                onclick="startInspection()">
+
+                🚨 Run AI Inspection
+
+            </button>
+
+
+
+            <!-- LOADING -->
+
+            <div
+                id="loading"
+                class="loading hidden">
+
+                <div class="loader"></div>
+
+                <span>
+                    AI is analyzing the road image...
+                </span>
+
+            </div>
+
+
+
+            <!-- RESULT -->
+
+            <div
+                id="resultBox"
+                class="result-box hidden">
+
+
+                <h3>
+                    📊 Inspection Result
+                </h3>
+
+
+                <div class="result-grid">
+
+
+                    <div class="result-item">
+
+                        <span>
+                            🕳️ Potholes
+                        </span>
+
+                        <strong id="potholes">
+                            0
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="result-item">
+
+                        <span>
+                            ⚠️ Severity
+                        </span>
+
+                        <strong id="severity">
+                            -
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="result-item">
+
+                        <span>
+                            💰 Estimated Cost
+                        </span>
+
+                        <strong id="cost">
+                            ₹0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ERROR -->
+
+            <div
+                id="errorBox"
+                class="error-box hidden">
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= SYSTEM STATUS ================= -->
+
+        <div class="panel">
+
+            <h2>
+                📡 System Status
+            </h2>
+
+            <p class="panel-description">
+                Live status of the smart infrastructure system.
+            </p>
+
+
+            <div class="status-list">
+
+
+                <div class="status-item">
+
+                    <span>
+                        AI Engine
+                    </span>
+
+                    <strong
+                        class="online"
+                        id="aiStatus">
+
+                        ONLINE
+
+                    </strong>
+
+                </div>
+
+
+
+                <div class="status-item">
+
+                    <span>
+                        YOLO Model
+                    </span>
+
+                    <strong
+                        class="online">
+
+                        LOADED
+
+                    </strong>
+
+                </div>
+
+
+
+                <div class="status-item">
+
+                    <span>
+                        Flask Backend
+                    </span>
+
+                    <strong
+                        class="online"
+                        id="backendStatus">
+
+                        CHECKING
+
+                    </strong>
+
+                </div>
+
+
+
+                <div class="status-item">
+
+                    <span>
+                        Database
+                    </span>
+
+                    <strong class="online">
+
+                        CONNECTED
+
+                    </strong>
+
+                </div>
+
+
+
+                <div class="status-item">
+
+                    <span>
+                        IoT System
+                    </span>
+
+                    <strong class="online">
+
+                        ONLINE
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="footer">
+
+        Road Damage AI • Smart City Infrastructure
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script src="script.js"></script>
+
+
+<script>
+
+    // ================= LOGOUT =================
+
+    function logout() {
+
+        sessionStorage.removeItem("loggedIn");
+
+        window.location.href = "index.html";
+
+    }
+
+
+
+    // ================= FILE NAME =================
+
+    const roadFile =
+        document.getElementById("roadFile");
+
+    const fileName =
+        document.getElementById("fileName");
+
+
+    roadFile.addEventListener(
+        "change",
+        function () {
+
+            if (roadFile.files.length > 0) {
+
+                fileName.textContent =
+                    roadFile.files[0].name;
+
+            } else {
+
+                fileName.textContent =
+                    "No image selected";
+
+            }
+
+        }
+    );
+
+
+
+    // ================= AI INSPECTION =================
+
+    async function startInspection() {
+
+        const file =
+            roadFile.files[0];
+
+
+        // No file
+
+        if (!file) {
+
+            alert(
+                "Please select a road image first."
+            );
+
+            return;
+
+        }
+
+
+        const button =
+            document.getElementById(
+                "inspectBtn"
+            );
+
+
+        const loading =
+            document.getElementById(
+                "loading"
+            );
+
+
+        const resultBox =
+            document.getElementById(
+                "resultBox"
+            );
+
+
+        const errorBox =
+            document.getElementById(
+                "errorBox"
+            );
+
+
+        // Reset
+
+        resultBox.classList.add("hidden");
+
+        errorBox.classList.add("hidden");
+
+
+        // Loading
+
+        button.disabled = true;
+
+        button.textContent =
+            "⏳ AI Inspecting...";
+
+        loading.classList.remove(
+            "hidden"
+        );
+
+
+        // FormData
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "file",
+            file
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "http://127.0.0.1:5000/api/inspect",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok ||
+                !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "AI inspection failed."
+                );
+
+            }
+
+
+            // ================= RESULT =================
+
+            document.getElementById(
+                "potholes"
+            ).textContent =
+                data.potholes;
+
+
+            document.getElementById(
+                "severity"
+            ).textContent =
+                data.severity;
+
+
+            document.getElementById(
+                "cost"
+            ).textContent =
+                "₹" +
+                Number(
+                    data.estimated_cost
+                ).toLocaleString("en-IN");
+
+
+            document.getElementById(
+                "alertCount"
+            ).textContent =
+                data.potholes;
+
+
+            resultBox.classList.remove(
+                "hidden"
+            );
+
+
+        }
+
+
+        catch (error) {
+
+            console.error(error);
+
+
+            errorBox.textContent =
+                "❌ " +
+                error.message;
+
+
+            errorBox.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        finally {
+
+            loading.classList.add(
+                "hidden"
+            );
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "🚨 Run AI Inspection";
+
+        }
+
+    }
+
+
+
+    // ================= BACKEND HEALTH =================
+
+    async function checkBackend() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "http://127.0.0.1:5000/api/health"
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (data.status === "online") {
+
+                document.getElementById(
+                    "backendStatus"
+                ).textContent =
+                    "ONLINE";
+
+
+                document.getElementById(
+                    "systemStatus"
+                ).textContent =
+                    "ONLINE";
+
+            }
+
+        }
+
+        catch (error) {
+
+            document.getElementById(
+                "backendStatus"
+            ).textContent =
+                "OFFLINE";
+
+
+            document.getElementById(
+                "backendStatus"
+            ).className =
+                "offline";
+
+
+            document.getElementById(
+                "systemStatus"
+            ).textContent =
+                "OFFLINE";
+
+        }
+
+    }
+
+
+    checkBackend();
+
+</script>
+
+
+</body>
+
+</html>

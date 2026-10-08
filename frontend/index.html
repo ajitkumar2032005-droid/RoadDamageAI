@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Road Surface Quality Assessment</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+</head>
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header class="navbar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                🛣️
+            </div>
+
+            <div>
+
+                <div class="brand-title">
+                    Road Surface AI
+                </div>
+
+                <div class="brand-subtitle">
+                    Quality Assessment System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <nav class="nav-links">
+
+            <a class="nav-link active" href="/">
+                🏠 Dashboard
+            </a>
+
+            <a class="nav-link" href="#results">
+                ◷ History
+            </a>
+
+            <a class="nav-link" href="#report">
+                📄 Reports
+            </a>
+
+            <button
+                class="logout-btn"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </button>
+
+        </nav>
+
+    </header>
+
+
+
+    <main class="main-container">
+
+
+        <!-- ================= HERO ================= -->
+
+        <section class="hero">
+
+            <h1>
+
+                AI-Based Road Surface Roughness
+
+                <span>
+                    & Ride-Quality Estimation
+                </span>
+
+            </h1>
+
+            <p class="hero-subtitle">
+                AI-Powered Road Surface Analysis System
+            </p>
+
+            <p class="hero-description">
+
+                Upload a road image and let our AI classify
+                surface quality, estimate severity, and suggest
+                maintenance actions with an approximate cost estimate.
+
+            </p>
+
+        </section>
+
+
+
+        <!-- ================= INSPECTION ================= -->
+
+        <section class="panel">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    📷
+                </div>
+
+                <div>
+
+                    <h2>
+                        Road Surface Analysis 
+                    </h2>
+
+                    <p>
+                        Upload a road image to analyze road surface quality using AI
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="inspection-grid">
+
+
+                <!-- UPLOAD -->
+
+                <div class="upload-area">
+
+                    <div class="upload-icon">
+                        ☁️
+                    </div>
+
+                    <h3>
+                        Drag & Drop your image here
+                    </h3>
+
+                    <p>
+                        or
+                    </p>
+
+                    <label
+                        for="roadFile"
+                        class="choose-btn"
+                    >
+                        Choose Image
+                    </label>
+
+                    <input
+                        type="file"
+                        id="roadFile"
+                        accept="image/*"
+                    >
+
+                    <p class="upload-info">
+
+                        Supports JPG, PNG, JPEG
+
+                        <br>
+
+                        (Max: 10MB)
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- PREVIEW -->
+
+                <div class="preview-area">
+
+                    <h3>
+                        Image Preview
+                    </h3>
+
+                    <div class="image-preview">
+
+                        <img
+                            id="previewImage"
+                            src=""
+                            alt="Road Surface Preview"
+                        >
+
+                        <div
+                            id="previewPlaceholder"
+                            class="preview-placeholder"
+                        >
+
+                            🖼️
+
+                            <br>
+
+                            Image preview will appear here
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- INSPECTION BUTTON -->
+
+            <button
+                class="inspect-btn"
+                onclick="inspectRoad()"
+                id="inspectBtn"
+            >
+
+                🤖 Analyze Road Surface
+
+            </button>
+
+
+
+            <!-- LOADING -->
+
+            <div
+                id="loading"
+                class="loading hidden"
+            >
+
+                <div class="spinner"></div>
+
+                <span>
+                    🤖 AI is analyzing the road surface...
+                </span>
+
+            </div>
+
+        </section>
+
+
+
+
+        <!-- ================= RESULTS ================= -->
+
+        <section
+            class="panel"
+            id="results"
+        >
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    📊
+                </div>
+
+                <div>
+
+                    <h2>
+                        Surface Quality Results
+                    </h2>
+
+                    <p>
+                        AI classification of the road surface quality
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="inspectionStatus"
+                    class="status-badge"
+                >
+                    ● Waiting for analysis
+                </div>
+
+            </div>
+
+
+
+            <div
+                id="resultPlaceholder"
+                class="result-placeholder"
+            >
+
+                Upload a road image and run AI analysis
+                to see results.
+
+            </div>
+
+
+
+            <div
+                id="resultContent"
+                class="hidden"
+            >
+
+
+                <!-- METRICS -->
+
+                <div class="metrics">
+
+
+                    <!-- CONFIDENCE -->
+
+                    <div class="metric-card">
+
+                        <span>
+                            AI Confidence
+                        </span>
+
+                        <strong
+                            id="damageCount"
+                            class="danger"
+                        >
+                            0%
+                        </strong>
+
+                        <small>
+                            Model Confidence
+                        </small>
+
+                    </div>
+
+
+
+                    <!-- SEVERITY -->
+
+                    <div class="metric-card">
+
+                        <span>
+                            Severity Level
+                        </span>
+
+                        <strong id="severity">
+                            -
+                        </strong>
+
+                        <small>
+                            Severity Assessment
+                        </small>
+
+                    </div>
+
+
+
+                    <!-- ROAD CONDITION -->
+
+                    <div class="metric-card">
+
+                        <span>
+                            Road Condition
+                        </span>
+
+                        <strong id="roadCondition">
+                            -
+                        </strong>
+
+                        <small>
+                            Surface Quality Class
+                        </small>
+
+                    </div>
+
+
+
+                    <!-- COST -->
+
+                    <div class="metric-card">
+
+                        <span>
+                            Estimated Maintenance Cost
+                        </span>
+
+                        <strong
+                            id="estimatedCost"
+                            class="cost"
+                        >
+                            ₹0
+                        </strong>
+
+                        <small>
+                            Approximate Project Estimate
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- DETAILS -->
+
+                <div class="details-grid">
+
+
+                    <!-- SURFACE DETAILS -->
+
+                    <div class="detail-card">
+
+                        <h3>
+                            Surface Analysis Details
+                        </h3>
+
+
+                        <div class="detail-row">
+
+                            <span>
+                                🎯 Confidence
+                            </span>
+
+                            <strong id="potholeDetail">
+                                0%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span>
+                                ⚠️ Severity
+                            </span>
+
+                            <strong id="severityDetail">
+                                -
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-row">
+
+                            <span>
+                                🛣️ Road Condition
+                            </span>
+
+                            <strong id="conditionDetail">
+                                -
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- RECOMMENDATIONS -->
+
+                    <div class="detail-card">
+
+                        <h3>
+                            🔧 Recommendations
+                        </h3>
+
+                        <ul id="recommendations">
+
+                            <li>
+                                Run AI analysis to receive recommendations.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+
+        <!-- ================= LOCATION & REPORT ================= -->
+
+        <section
+            class="panel"
+            id="report"
+        >
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    📍
+                </div>
+
+                <div>
+
+                    <h2>
+                        Location & Report
+                    </h2>
+
+                    <p>
+                        Capture analysis location and send the inspection report
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="report-grid">
+
+
+                <!-- LOCATION -->
+
+                <div class="action-card">
+
+                    <h3>
+                        Current Location
+                    </h3>
+
+
+                    <div class="location-search">
+
+                        <input
+                            type="text"
+                            id="locationInput"
+                            placeholder="Enter road or location name"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="findLocation()"
+                        >
+                            🔍 Find Location
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="locationStatus"
+                        class="location-status"
+                    >
+
+                        <span class="location-dot"></span>
+
+                        Location Not Captured
+
+                    </div>
+
+
+                    <div
+                        id="coordinates"
+                        class="coordinates"
+                    >
+                    </div>
+
+
+                    <div id="map"></div>
+
+
+                    <button
+                        class="secondary-btn"
+                        onclick="getLocation()"
+                    >
+                        📍 Get Current Location
+                    </button>
+
+                </div>
+
+
+
+
+                <!-- REPORT -->
+
+                <div class="action-card">
+
+                    <h3>
+                        Send Analysis Report to Department
+                    </h3>
+
+
+                    <div class="email-input-group">
+
+                        <label for="recipientEmail">
+                            📧 Recipient Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="recipientEmail"
+                            placeholder="Enter recipient email"
+                            required
+                        >
+
+                    </div>
+
+
+                    <p>
+
+                        Generate and send the road surface quality
+                        analysis report to the concerned department.
+
+                    </p>
+
+
+                    <button
+                        class="report-btn"
+                        onclick="sendReport()"
+                    >
+
+                        ✉️ Send Report
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer>
+
+            <div>
+
+                🛡️
+
+                <strong>
+                    AI Road Surface Quality Assessment
+                </strong>
+
+                <br>
+
+                © 2026 All Rights Reserved
+
+            </div>
+
+
+            <div class="footer-right">
+
+                Developed with ❤️ for Better Roads
+
+                <br>
+
+                AI-Powered | Surface Quality Analysis | Better Infrastructure
+
+            </div>
+
+        </footer>
+
+
+    </main>
+
+
+
+    <script src="script.js"></script>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
+
+</body>
+
+</html>
